@@ -15,7 +15,17 @@ test("shows the server-calculated urgency label in the ticket list", async ({
   await expect(ticketRow).toContainText("prioritario");
 });
 
-test.fixme(
-  "", // potete inserire alta + telefono
-  async () => { }
-);
+
+test("shows the server validation error when the title is too short", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByLabel("Titolo").fill("ab");
+  await page.getByLabel("Cliente").fill("Alfa S.r.l.");
+  await page.getByRole("radio", { name: "normale" }).check();
+  await page.getByRole("radio", { name: "email" }).check();
+  await page.getByRole("button", { name: "Salva ticket" }).click();
+
+  await expect(page.getByRole("status")).toHaveText(
+    "Inserisci un titolo di almeno 3 caratteri."
+  );
+});
