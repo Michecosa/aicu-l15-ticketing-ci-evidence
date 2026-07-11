@@ -29,3 +29,19 @@ test("shows the server validation error when the title is too short", async ({ p
     "Inserisci un titolo di almeno 3 caratteri."
   );
 });
+
+test("alta + telefono -> intervento rapido nella riga creata", async ({ page }) => {
+  const uniqueTitle = `Richiesta urgente ${Date.now()}`;
+
+  await page.goto("/");
+
+  await page.getByLabel("Titolo").fill(uniqueTitle);
+  await page.getByLabel("Cliente").fill("Gamma S.p.A.");
+  await page.getByRole("radio", { name: "alta" }).check();
+  await page.getByRole("radio", { name: "telefono" }).check();
+  await page.getByRole("button", { name: "Salva ticket" }).click();
+
+  const createdRow = page.getByRole("row").filter({ hasText: uniqueTitle });
+
+  await expect(createdRow).toContainText("intervento rapido");
+});
